@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        li {
+            list-style: none;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            padding-block: 1rem;
+            padding-inline: 1rem;
+            width: 30rem;
+
+            display: flex;
+            flex-direction: column;
+
+            margin-left: auto;
+            margin-right: auto;
+
+            background-color: antiquewhite;
+            box-shadow: 1px 1px 1px black;
+
+        }
+
+        .strikedout {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .priority {
+            color: red;
+        }
+
+        li {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="shopping-list" class="card">
+            <h1>{{ header || "Welcome" }}</h1>
+            <button v-if="editing" @click="doEdit(false)">Cancel</button>
+            <button v-else @click="doEdit(true)" >Add Item</button>
+            <input
+                v-if="editing"
+                v-model="newItem"
+                @keyup.enter="saveItem"
+                type="text" 
+                placeholder="Add shopping list">
+
+            <label>
+                <input 
+                    type="checkbox" 
+                    v-model="newItemHighPriority">
+                    High Priority
+            </label>
+            {{characterCount}}/200
+            <button
+                v-bind:disabled="newItem.length < 5"
+                @click="saveItem">
+                Save item
+            </button>
+
+            <!-- <label><input type="checkbox" v-model="iceCreamFlavors" value="vanilla">Vanilla</label>
+            <label><input type="checkbox" v-model="iceCreamFlavors" value="chocolate">Chocolate</label>
+            <label><input type="checkbox" v-model="iceCreamFlavors" value="strawberry">Strawberry</label>
+            <label><input type="checkbox" v-model="iceCreamFlavors" value="cookies and cream">Cookies and cream</label> -->
+
+            <!-- {{newItem}} {{newItemHighPriority}} -->
+
+            <p v-if="items.length === 0">Nice job! You've bought all your items!</p>
+            <ul>
+                <!-- <li v-for="item in items" :key="item.id">{{item.label}}</li> -->
+                <!-- <li v-for="item in items" :key="item.id">{{item.label}}</li> -->
+                <li 
+                    v-for="item in reversedItem"
+                    @click="togglePurchase(item)"
+                    :key="item.id"
+                    :class="{strikedout: item.purchased, priority: item.highPriority && !item.purchased}"
+                    class="static-class"
+                    
+                >
+                    {{item.label}}
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    
+    <script src="https://unpkg.com/vue@3"></script>
+    <script>
+       const shoppingList = Vue.createApp({
+            data() {
+                return {
+                    header: 'Shopping List App',
+                    newItem: '',
+                    editing: false,
+                    newItemHighPriority: false,
+                    // iceCreamFlavors: [],
+                    items: [
+                        { id: 1, label: "10 party hats", purchased: true, highPriority: false },
+                        { id: 2, label: "2 board games", purchased: true, highPriority: false },
+                        { id: 3, label: "20 cups", purchased: false, highPriority: true }
+                    ]
+                    // items: {
+                    //     "item-1": { id: 1, label: "10 party hats" },
+                    //     "item-2": { id: 2, label: "2 board games" },
+                    //     "item-3": { id: 3, label: "20 cups" }
+                    // }
+                }
+            },
+
+            computed: {
+                characterCount() {
+                    return this.newItem.length
+                },
+
+                reversedItem() {
+                    return [...this.items].reverse()
+                }
+            },
+
+            methods: {
+                saveItem() {
+                    this.items.push({
+                        id: this.items.length + 1,
+                        label: this.newItem,
+                        highPriority: this.newItemHighPriority
+                    })
+                    this.newItem = ''
+                    this.newItemHighPriority = ''
+                },
+
+                doEdit(edit) {
+                    this.editing = edit
+                    this.newItem = ""
+                    this.newItemHighPriority = ''
+                },
+
+                togglePurchase(item) {
+                    item.purchased = !item.purchased
+                }
+            }
+        })
+        .mount('#shopping-list')
+    </script>
+</body>
+</html>
